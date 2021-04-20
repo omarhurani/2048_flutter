@@ -8,8 +8,8 @@ import '../model/tile.dart';
 class GameController extends ChangeNotifier{
 
   static const int
-  _minSize = 3,
-      _maxSize = 20,
+  minSize = 3,
+      maxSize = 20,
       _initTiles = 2;
 
   int _x, _y;
@@ -37,9 +37,9 @@ class GameController extends ChangeNotifier{
 
   void initGame({int x, int y, int bestScore = 0}){
     if(x != null)
-      _x = x.clamp(_minSize, _maxSize);
+      _x = x.clamp(minSize, maxSize);
     if(y != null)
-      _y = y.clamp(_minSize, _maxSize);
+      _y = y.clamp(minSize, maxSize);
     _board = List.generate(_x, (index) => List.generate(_y, (index) => []));
     _uiBoard = _board;
     _score = 0;

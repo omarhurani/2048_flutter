@@ -24,7 +24,11 @@ final theme = ThemeData(
     ),
     bodyText1: GoogleFonts.robotoSlab().copyWith(
       color: bodyText1Color
-    )
+    ),
+  ),
+
+  iconTheme: IconThemeData(
+    color: primaryColor
   ),
 
   textButtonTheme: TextButtonThemeData(
@@ -39,5 +43,16 @@ final theme = ThemeData(
           const EdgeInsets.symmetric(vertical: 15, horizontal: 25)
       )
     )
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    // contentPadding: EdgeInsets.all(0),
+    isDense: true,
+    border: OutlineInputBorder(
+      borderRadius: borderRadius,
+    ),
+    errorStyle: TextStyle(
+      fontSize: 0.001,
+    )
+
   )
 );

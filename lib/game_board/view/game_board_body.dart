@@ -11,11 +11,8 @@ import 'package:provider/provider.dart';
 
 class GameBoardBody extends StatefulWidget {
 
-  final Widget header;
-
   const GameBoardBody({
     Key key,
-    this.header,
   }) : super(key: key);
 
 
@@ -41,117 +38,89 @@ class _GameBoardBodyState extends State<GameBoardBody> {
   @override
   Widget build(BuildContext context) {
     var game = Provider.of<GameController>(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      verticalDirection: VerticalDirection.up,
+    return Stack(
       children: [
-        Flexible(
-          child: Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).backgroundColor,
-                  borderRadius: borderRadius
-                ),
-                padding: _padding,
-                child: LayoutBuilder(
-                    builder: (context, constraints){
-                      final size = min(constraints.maxWidth/game.rows, constraints.maxHeight/game.columns);
-                      // final size = fullSize / max(game.rows, game.columns);
-                      final widgetWidth = size * game.columns;
-                      if(this.size != widgetWidth){
-                        this.size = widgetWidth;
-                        // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                        //   setState(() {});
-                        // });
-                      }
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).backgroundColor,
+            borderRadius: borderRadius
+          ),
+          padding: _padding,
+          child: LayoutBuilder(
+              builder: (context, constraints){
+                final size = min(constraints.maxWidth/game.columns, constraints.maxHeight/game.rows);
 
-                      final padding = EdgeInsets.all(size * 0.05);
-                      return SizedBox(
-                        width: size * game.columns,
-                        height: size * game.rows,
-                        child: RawKeyboardListener(
-                          autofocus: true,
-                          focusNode: FocusNode(),
-                          onKey: onKey,
-                          child: Stack(
-                            children: [
-                              for (var row in game.board.asMap().entries)
-                                for (var col in row.value.asMap().entries)
-                                  AnimatedPositioned(
-                                    left: size * col.key,
-                                    top: size * row.key,
-                                    duration: _duration,
-                                    curve: _curve,
+                final padding = EdgeInsets.all(size * 0.05);
+                return SizedBox(
+                  width: size * game.columns,
+                  height: size * game.rows,
+                  child: RawKeyboardListener(
+                    autofocus: true,
+                    focusNode: FocusNode(),
+                    onKey: onKey,
+                    child: Stack(
+                      children: [
+                        for (var row in game.board.asMap().entries)
+                          for (var col in row.value.asMap().entries)
+                            AnimatedPositioned(
+                              left: size * col.key,
+                              top: size * row.key,
+                              duration: _duration,
+                              curve: _curve,
+                              child: Container(
+                                width: size,
+                                height: size,
+                                padding: padding,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).accentColor,
+                                      borderRadius: borderRadius
+                                  ),                        // margin: _padding,
+                                ),
+                              ),
+                            ),
+
+                        for (var row in game.board.asMap().entries)
+                          for (var col in row.value.asMap().entries)
+                            for (var tile in col.value)
+                              AnimatedPositioned(
+                                key: ValueKey(tile),
+                                left: size * col.key,
+                                top: size * row.key,
+                                duration: _duration,
+                                curve: _curve,
+                                child: Container(
+                                    width: size,
+                                    height: size,
+                                    padding: padding,
                                     child: Container(
                                       width: size,
                                       height: size,
-                                      padding: padding,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context).accentColor,
-                                            borderRadius: borderRadius
-                                        ),                        // margin: _padding,
+                                      child: TileWidget(
+                                        // key: ValueKey(tile),
+                                          tile: tile
                                       ),
-                                    ),
-                                  ),
+                                    )
 
-                              for (var row in game.board.asMap().entries)
-                                for (var col in row.value.asMap().entries)
-                                  for (var tile in col.value)
-                                    AnimatedPositioned(
-                                      key: ValueKey(tile),
-                                      left: size * col.key,
-                                      top: size * row.key,
-                                      duration: _duration,
-                                      curve: _curve,
-                                      child: Container(
-                                          width: size,
-                                          height: size,
-                                          padding: padding,
-                                          child: Container(
-                                            width: size,
-                                            height: size,
-                                            child: TileWidget(
-                                              // key: ValueKey(tile),
-                                                tile: tile
-                                            ),
-                                          )
-
-                                      ),
-                                    ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                ),
-              ),
-              if(game.calculateAvailableMoves() == 0)
-                Positioned.fill(
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0, end: 1),
-                    duration: _duration,
-                    builder: (context, value, child) =>
-                        Opacity(
-                          opacity: value,
-                          child: GameOverScreen(),
-                        ),
+                                ),
+                              ),
+                      ],
+                    ),
                   ),
-                ),
-            ],
+                );
+              }
           ),
         ),
-        if(widget.header != null)
-          Opacity(
-            opacity: size == null ? 0 : 1,
-            child: Container(
-              width: size,
-              child: FittedBox(
-                child: widget.header,
-                fit: BoxFit.fitWidth,
-
-              ),
+        if(game.calculateAvailableMoves() == 0)
+          Positioned.fill(
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: _duration,
+              builder: (context, value, child) =>
+                  Opacity(
+                    opacity: value,
+                    child: GameOverScreen(),
+                  ),
             ),
           ),
       ],
