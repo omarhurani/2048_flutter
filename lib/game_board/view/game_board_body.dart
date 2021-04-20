@@ -28,7 +28,7 @@ class _GameBoardBodyState extends State<GameBoardBody> {
   static const Curve _curve = Curves.easeInOut;
   static const EdgeInsets _padding = const EdgeInsets.all(10);
 
-  double size;
+  Offset panOffset = Offset(0, 0);
 
   @override
   void initState() {
@@ -54,57 +54,65 @@ class _GameBoardBodyState extends State<GameBoardBody> {
                 return SizedBox(
                   width: size * game.columns,
                   height: size * game.rows,
-                  child: RawKeyboardListener(
-                    autofocus: true,
-                    focusNode: FocusNode(),
-                    onKey: onKey,
-                    child: Stack(
-                      children: [
-                        for (var row in game.board.asMap().entries)
-                          for (var col in row.value.asMap().entries)
-                            AnimatedPositioned(
-                              left: size * col.key,
-                              top: size * row.key,
-                              duration: _duration,
-                              curve: _curve,
-                              child: Container(
-                                width: size,
-                                height: size,
-                                padding: padding,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context).accentColor,
-                                      borderRadius: borderRadius
-                                  ),                        // margin: _padding,
-                                ),
-                              ),
-                            ),
-
-                        for (var row in game.board.asMap().entries)
-                          for (var col in row.value.asMap().entries)
-                            for (var tile in col.value)
+                  child: Listener(
+                    // onPanStart: onPanStart,
+                    // onPanUpdate: (details) => onPanUpdate(details, size/16),
+                    // onPanEnd: onPanEnd,
+                    onPointerDown: onPointerDown,
+                    onPointerMove: (details) => onPointerMove(details, size/16),
+                    onPointerUp: onPointerUp,
+                    child: RawKeyboardListener(
+                      autofocus: true,
+                      focusNode: FocusNode(),
+                      onKey: onKey,
+                      child: Stack(
+                        children: [
+                          for (var row in game.board.asMap().entries)
+                            for (var col in row.value.asMap().entries)
                               AnimatedPositioned(
-                                key: ValueKey(tile),
                                 left: size * col.key,
                                 top: size * row.key,
                                 duration: _duration,
                                 curve: _curve,
                                 child: Container(
-                                    width: size,
-                                    height: size,
-                                    padding: padding,
-                                    child: Container(
-                                      width: size,
-                                      height: size,
-                                      child: TileWidget(
-                                        // key: ValueKey(tile),
-                                          tile: tile
-                                      ),
-                                    )
-
+                                  width: size,
+                                  height: size,
+                                  padding: padding,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Theme.of(context).accentColor,
+                                        borderRadius: borderRadius
+                                    ),                        // margin: _padding,
+                                  ),
                                 ),
                               ),
-                      ],
+
+                          for (var row in game.board.asMap().entries)
+                            for (var col in row.value.asMap().entries)
+                              for (var tile in col.value)
+                                AnimatedPositioned(
+                                  key: ValueKey(tile),
+                                  left: size * col.key,
+                                  top: size * row.key,
+                                  duration: _duration,
+                                  curve: _curve,
+                                  child: Container(
+                                      width: size,
+                                      height: size,
+                                      padding: padding,
+                                      child: Container(
+                                        width: size,
+                                        height: size,
+                                        child: TileWidget(
+                                          // key: ValueKey(tile),
+                                            tile: tile
+                                        ),
+                                      )
+
+                                  ),
+                                ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -151,6 +159,66 @@ class _GameBoardBodyState extends State<GameBoardBody> {
           break;
       }
     }
+  }
+
+  void onPanStart(DragStartDetails details){
+    panOffset = Offset(0, 0);
+  }
+
+  void onPanUpdate(DragUpdateDetails details, double panDistance){
+    if(panOffset == null)
+      return;
+
+    panOffset = panOffset + details.delta;
+
+    if(panOffset.dx.clamp(-panDistance, panDistance) == panOffset.dx &&
+        panOffset.dy.clamp(-panDistance, panDistance) == panOffset.dy)
+      return;
+
+    if(panOffset.dx > panDistance) // right
+      move(MovementDirection.right);
+    else if(panOffset.dx < -panDistance)
+      move(MovementDirection.left);
+    else if(panOffset.dy > panDistance)
+      move(MovementDirection.down);
+    else if(panOffset.dy < -panDistance)
+      move(MovementDirection.up);
+
+    panOffset = null;
+  }
+
+  void onPanEnd(DragEndDetails details){
+    print(panOffset);
+  }
+
+  void onPointerDown(PointerDownEvent event){
+    // panOffset = Offset(0, 0);
+  }
+
+  void onPointerMove(PointerMoveEvent event, double threshold){
+    if(panOffset == null)
+      return;
+
+    panOffset = panOffset + event.delta;
+
+    if(panOffset.dx.clamp(-threshold, threshold) == panOffset.dx &&
+        panOffset.dy.clamp(-threshold, threshold) == panOffset.dy)
+      return;
+
+    if(panOffset.dx > threshold) // right
+      move(MovementDirection.right);
+    else if(panOffset.dx < -threshold)
+      move(MovementDirection.left);
+    else if(panOffset.dy > threshold)
+      move(MovementDirection.down);
+    else if(panOffset.dy < -threshold)
+      move(MovementDirection.up);
+
+    panOffset = null;
+  }
+
+  void onPointerUp(PointerUpEvent event){
+    panOffset = Offset(0, 0);
   }
 }
 
