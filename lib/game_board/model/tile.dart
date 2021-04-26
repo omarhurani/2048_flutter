@@ -32,6 +32,10 @@ class Tile{
   String toString() {
     return value.toString();
   }
+
+  Map<String, dynamic> toJson() => {'value': value};
+  factory Tile.fromJson(Map<String, dynamic> json) => Tile(json['value']);
+
 }
 
 class TileColor{

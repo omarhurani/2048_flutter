@@ -26,7 +26,9 @@ class GameController extends ChangeNotifier{
     initGame(x: x, y: y);
   }
 
-  List<List<List<Tile>>> get emptyTiles => _board.map((e) => e.where((e) => e.isEmpty).toList()).where((e) => e.isNotEmpty).toList();
+  List<List<List<Tile>>> get emptyTiles => _board
+      .map((e) => e.where((e) => e.isEmpty).toList())
+      .where((e) => e.isNotEmpty).toList();
 
 
   List<List<List<Tile>>> get board => _uiBoard;
@@ -179,7 +181,7 @@ class GameController extends ChangeNotifier{
                   Tile(v.value + e.value, parents: Set<Tile>.of([]..add(e)..add(v)))
           );
           // print("Merge ${mergedValue.parents}");
-          col.removeWhere((element) => true);
+          col.clear();
           col.add(mergedValue);
           _score += mergedValue.value;
           if(_score > _bestScore)
