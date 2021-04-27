@@ -47,10 +47,10 @@ class GameBoardBloc extends Bloc<GameBoardEvent, GameBoardState>{
       x ?? state.x,
       y ?? state.y
     );
-    var bestScore = gameBoard.bestScore ?? 0;
+    var bestScore = gameBoard?.bestScore ?? 0;
     return GameBoardState(
-      x: x,
-      y: y,
+      x: x ?? state.x,
+      y: y ?? state.y,
       bestScore: bestScore,
       score: 0
     ).copyWithRandomTiles(_initTiles);

@@ -38,33 +38,30 @@ class HomeScreen extends StatelessWidget {
                           GameBoardBloc(RepositoryProvider.of<SavedGameBoardRepository>(context))
                       )
                     ],
-                    child: ChangeNotifierProvider<GameController>(
-                      create: (_) => GameController(4, 4),
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: LayoutBuilder(
-                          builder: (context, constraints){
-                            return ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: constraints.maxWidth.clamp(0, maxGameWidth),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: LayoutBuilder(
+                        builder: (context, constraints){
+                          return ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: constraints.maxWidth.clamp(0, maxGameWidth),
+                            ),
+                            child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            // verticalDirection: VerticalDirection.up,
+                            children: [
+                              HomeScreenHeader(),
+                              SizedBox(
+                                height: 50,
                               ),
-                              child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              // verticalDirection: VerticalDirection.up,
-                              children: [
-                                HomeScreenHeader(),
-                                SizedBox(
-                                  height: 50,
-                                ),
-                                Flexible(
-                                  child: GameBoard()
-                                ),
-                              ],
-                            ),);
-                          },
-                        ),
-                      )
+                              Flexible(
+                                child: GameBoard()
+                              ),
+                            ],
+                          ),);
+                        },
+                      ),
                     ),
                   ),
                 ),

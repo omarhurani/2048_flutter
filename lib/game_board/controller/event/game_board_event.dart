@@ -1,3 +1,4 @@
+import 'package:game_2048/game_board/controller/state/game_board_state.dart';
 import 'package:game_2048/game_board/model/movement_direction.dart';
 
 class GameBoardEvent{
@@ -17,11 +18,9 @@ class GameBoardMovedEvent extends GameBoardEvent{
 
 class GameBoardResetEvent extends GameBoardEvent{
 
-  static const int minSize = 3, maxSize = 20;
-
   final int x, y;
 
   GameBoardResetEvent([int x, int y]):
-        this.x = x?.clamp(minSize, maxSize),
-        this.y = y?.clamp(minSize, maxSize);
+        this.x = x?.clamp(GameBoardState.minSize, GameBoardState.maxSize),
+        this.y = y?.clamp(GameBoardState.minSize, GameBoardState.maxSize);
 }

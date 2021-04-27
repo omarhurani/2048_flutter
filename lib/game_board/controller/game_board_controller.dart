@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../model/movement_direction.dart';
 import '../model/tile.dart';
 
-class GameController extends ChangeNotifier{
+class GameControllers extends ChangeNotifier{
 
   static const int
   minSize = 3,

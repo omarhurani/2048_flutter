@@ -5,6 +5,8 @@ import 'package:game_2048/utils/extensions.dart';
 
 class GameBoardState{
 
+  static const int minSize = 3, maxSize = 20;
+
   final Random _random;
 
   List<List<List<Tile>>> _board;
@@ -29,9 +31,7 @@ class GameBoardState{
   {
     _board = _board ?? List<List<List<Tile>>>.generate(
         x, (index) => List<List<Tile>>.generate(
-        y, (index) => <Tile>[])
-        )
-        ;
+        y, (index) => <Tile>[])) ;
     score = score ?? 0;
     bestScore = bestScore ?? 0;
   }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:game_2048/game_board/controller/bloc/game_board_bloc.dart';
+import 'package:game_2048/game_board/controller/event/game_board_event.dart';
 import 'package:game_2048/game_board/controller/game_board_controller.dart';
+import 'package:game_2048/game_board/controller/state/game_board_state.dart';
 import 'package:game_2048/home_screen/view/home_screen_overlay_manager.dart';
 import 'package:game_2048/utils/theme.dart';
 import 'package:provider/provider.dart';
@@ -40,9 +44,9 @@ class HomeScreenHeader extends StatelessWidget {
                       direction: smallScreen ? Axis.vertical : Axis.horizontal,
                       mainAxisAlignment:  MainAxisAlignment.end,
                       children: [
-                        Consumer<GameController>(
-                          builder: (context, provider, child) => TweenAnimationBuilder<double>(
-                              tween: Tween(begin: 0, end: provider.score.toDouble()),
+                        BlocBuilder<GameBoardBloc, GameBoardState>(
+                          builder: (context, state) => TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 0, end: state?.score?.toDouble() ?? 0),
                               duration: Duration(milliseconds: 250),
                               curve: Curves.easeOut,
                               builder: (context, value, child) {
@@ -59,14 +63,14 @@ class HomeScreenHeader extends StatelessWidget {
                           height: 10,
                         ),
 
-                        Consumer<GameController>(
-                          builder: (context, provider, child) => TweenAnimationBuilder<double>(
-                              tween: Tween(begin: 0, end: provider.bestScore.toDouble()),
+                        BlocBuilder<GameBoardBloc, GameBoardState>(
+                          builder: (context, state) => TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 0, end: state?.bestScore?.toDouble() ?? 0),
                               duration: Duration(milliseconds: 250),
                               curve: Curves.easeOut,
                               builder: (context, value, child) {
                                 return ScoreIndicator(
-                                  title: "Best (${provider.rows} × ${provider.columns})",
+                                  title: "Best " + (state != null ? "(${state.x} × ${state.y})" : ""),
                                   score: value.toInt(),
                                 );
                               }
@@ -153,9 +157,11 @@ class _NewGameWidgetState extends State<NewGameWidget> with TickerProviderStateM
   void initInputControllers(){
     widthController = TextEditingController();
     heightController = TextEditingController();
-    var game = Provider.of<GameController>(context, listen: false);
-    widthController.text = game.rows.toString();
-    heightController.text = game.columns.toString();
+    var game = context.read<GameBoardBloc>().state;
+    if(game == null)
+      return;
+    widthController.text = game.x.toString();
+    heightController.text = game.y.toString();
   }
 
   void initAnimationControllers(){
@@ -266,8 +272,11 @@ class _NewGameWidgetState extends State<NewGameWidget> with TickerProviderStateM
   }
 
   void startNewGame([int x, int y]){
-    Provider.of<GameController>(context, listen: false)
-        .initGame(x: x, y: y);
+    // Provider.of<GameController>(context, listen: false)
+    //     .initGame(x: x, y: y);
+    context.read<GameBoardBloc>().add(
+      GameBoardResetEvent(x, y)
+    );
 
     if((_settingsPopupEntry?.mounted ?? false))
       toggleSettingsShown();
@@ -375,8 +384,8 @@ class SettingsPopup extends StatelessWidget {
     if(intValue == null){
       return "";
     }
-    if(intValue.clamp(GameController.minSize, GameController.maxSize) != intValue){
-      return "Between ${GameController.minSize} and ${GameController.maxSize}";
+    if(intValue.clamp(GameBoardState.minSize, GameBoardState.maxSize) != intValue){
+      return "Between ${GameBoardState.minSize} and ${GameBoardState.maxSize}";
     }
     return null;
   }
