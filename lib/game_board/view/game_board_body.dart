@@ -1,12 +1,10 @@
 
 import 'dart:math';
 
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:game_2048/game_board/controller/bloc/game_board_bloc.dart';
 import 'package:game_2048/game_board/controller/event/game_board_event.dart';
-import 'package:game_2048/game_board/controller/game_board_controller.dart';
 import 'package:game_2048/game_board/model/movement_direction.dart';
 import 'package:game_2048/game_board/model/tile.dart';
 import 'package:game_2048/utils/theme.dart';
@@ -27,7 +25,7 @@ class GameBoardBody extends StatefulWidget {
 class _GameBoardBodyState extends State<GameBoardBody> {
   // List<List<Tile>> board;
 
-  static const Duration _duration = Duration(milliseconds: 250);
+  static const Duration _duration = Duration(milliseconds: 150);
   static const Curve _curve = Curves.easeInOut;
   static const EdgeInsets _padding = const EdgeInsets.all(10);
 
@@ -60,16 +58,14 @@ class _GameBoardBodyState extends State<GameBoardBody> {
                 final size = min(constraints.maxWidth/game.x, constraints.maxHeight/game.y);
 
                 final padding = EdgeInsets.all(size * 0.05);
-                return SizedBox(
-                  width: size * game.x,
-                  height: size * game.y,
-                  child: Listener(
-                    // onPanStart: onPanStart,
-                    // onPanUpdate: (details) => onPanUpdate(details, size/16),
-                    // onPanEnd: onPanEnd,
-                    onPointerDown: onPointerDown,
-                    onPointerMove: (details) => onPointerMove(details, size/16),
-                    onPointerUp: onPointerUp,
+                return Listener(
+                  onPointerDown: onPointerDown,
+                  onPointerMove: (details) => onPointerMove(details, size/16),
+                  onPointerUp: onPointerUp,
+                  child: Container(
+                    width: size * game.x,
+                    height: size * game.y,
+                    color: Colors.transparent,
                     child: RawKeyboardListener(
                       autofocus: true,
                       focusNode: FocusNode(),
@@ -89,8 +85,8 @@ class _GameBoardBodyState extends State<GameBoardBody> {
                                   padding: padding,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        color: Theme.of(context).accentColor,
-                                        borderRadius: borderRadius
+                                      color: Theme.of(context).accentColor,
+                                      borderRadius: borderRadius
                                     ),                        // margin: _padding,
                                   ),
                                 ),
@@ -204,6 +200,7 @@ class _GameBoardBodyState extends State<GameBoardBody> {
   }
 
   void onPointerDown(PointerDownEvent event){
+    print(event);
     // panOffset = Offset(0, 0);
   }
 
@@ -240,7 +237,7 @@ class TileWidget extends StatelessWidget {
 
   const TileWidget({Key key, this.tile}) : super(key: key);
 
-  static const Duration _duration = Duration(milliseconds: 250);
+  static const Duration _duration = Duration(milliseconds: 150);
   static const Curve _orphanCurve = Curves.bounceInOut;
   static const Curve _parentCurve = Curves.easeOutBack;
 
