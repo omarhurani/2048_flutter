@@ -64,11 +64,11 @@ class GameBoardState{
   GameBoardState copyWithRandomTiles([int randomTileCount = 1]){
     var count = randomTileCount ?? 1;
     var state = this.copy();
-    var emptyTiles = state.emptyTiles;
+    // var emptyTiles = state.emptyTiles;
     while(count-- != 0){
-      if(emptyTiles.isNotEmpty){
+      if(state.emptyTiles.isNotEmpty){
         int tileValue = _random.nextBool() ? 2 : 4;
-        ((emptyTiles..shuffle(_random)).first..shuffle()).first.add(Tile(tileValue));
+        ((state.emptyTiles..shuffle(_random)).first..shuffle()).first.add(Tile(tileValue));
       }
     }
     return state;
@@ -111,5 +111,16 @@ class GameBoardState{
   int get y => _y;
   int get score => _score ?? 0;
   int get bestScore => _bestScore ?? 0;
+
+  int get maxTileValue{
+    int maxTileValue = 0;
+    for(var row in board)
+      for(var cell in row)
+        for(var tile in cell)
+          if(tile != null && (tile.value ?? 0) > maxTileValue)
+            maxTileValue = tile.value;
+
+    return maxTileValue;
+  }
 
 }
