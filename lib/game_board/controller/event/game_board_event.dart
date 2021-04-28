@@ -24,3 +24,5 @@ class GameBoardResetEvent extends GameBoardEvent{
         this.x = x?.clamp(GameBoardState.minSize, GameBoardState.maxSize),
         this.y = y?.clamp(GameBoardState.minSize, GameBoardState.maxSize);
 }
+
+class GameBoardContinuedEvent extends GameBoardEvent{}

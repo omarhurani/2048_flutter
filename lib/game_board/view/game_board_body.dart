@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:game_2048/game_board/controller/bloc/game_board_bloc.dart';
 import 'package:game_2048/game_board/controller/event/game_board_event.dart';
+import 'package:game_2048/game_board/controller/state/game_board_state.dart';
 import 'package:game_2048/game_board/model/movement_direction.dart';
 import 'package:game_2048/game_board/model/tile.dart';
 import 'package:game_2048/utils/theme.dart';
@@ -31,31 +32,44 @@ class _GameBoardBodyState extends State<GameBoardBody> {
 
   Offset panOffset = Offset(0, 0);
 
+  GlobalKey gameOverKey, youWinKey;
+
+  GameBoardState _previousBoard;
+
+  FocusNode keyboardListenerFocusNode;
+
   @override
   void initState() {
     super.initState();
     context.read<GameBoardBloc>().add(
       GameBoardStartedEvent()
     );
+    keyboardListenerFocusNode = FocusNode();
+    gameOverKey = GlobalKey();
+    youWinKey = GlobalKey();
   }
 
   @override
   Widget build(BuildContext context) {
-    var gameBloc = context.watch<GameBoardBloc>();
-    var game = gameBloc.state;
-    if(game == null)
-      return CircularProgressIndicator();
+    var gameBoardBloc = context.watch<GameBoardBloc>();
+    var board = gameBoardBloc.state;
+    var previousBoard = _previousBoard;
+    _previousBoard = board;
+    if(board == null)
+      return Center(
+        child: CircularProgressIndicator()
+      );
     return Stack(
       children: [
         Container(
           decoration: BoxDecoration(
-              color: Theme.of(context).backgroundColor,
-              borderRadius: borderRadius
+            color: Theme.of(context).backgroundColor,
+            borderRadius: borderRadius
           ),
           padding: _padding,
           child: LayoutBuilder(
               builder: (context, constraints){
-                final size = min(constraints.maxWidth/game.x, constraints.maxHeight/game.y);
+                final size = min(constraints.maxWidth/board.x, constraints.maxHeight/board.y);
 
                 final padding = EdgeInsets.all(size * 0.05);
                 return Listener(
@@ -63,16 +77,16 @@ class _GameBoardBodyState extends State<GameBoardBody> {
                   onPointerMove: (details) => onPointerMove(details, size/16),
                   onPointerUp: onPointerUp,
                   child: Container(
-                    width: size * game.x,
-                    height: size * game.y,
+                    width: size * board.x,
+                    height: size * board.y,
                     color: Colors.transparent,
                     child: RawKeyboardListener(
                       autofocus: true,
-                      focusNode: FocusNode(),
+                      focusNode: keyboardListenerFocusNode,
                       onKey: onKey,
                       child: Stack(
                         children: [
-                          for (var row in game.board.asMap().entries)
+                          for (var row in board.board.asMap().entries)
                             for (var col in row.value.asMap().entries)
                               AnimatedPositioned(
                                 left: size * col.key,
@@ -92,7 +106,7 @@ class _GameBoardBodyState extends State<GameBoardBody> {
                                 ),
                               ),
 
-                          for (var row in game.board.asMap().entries)
+                          for (var row in board.board.asMap().entries)
                             for (var col in row.value.asMap().entries)
                               for (var tile in col.value)
                                 AnimatedPositioned(
@@ -124,7 +138,24 @@ class _GameBoardBodyState extends State<GameBoardBody> {
               }
           ),
         ),
-        if(gameBloc.calculateAvailableMoves() == 0)
+        if(gameBoardBloc.calculateAvailableMoves() == 0)
+          Positioned.fill(
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: _duration,
+              builder: (context, value, child) =>
+                Opacity(
+                  opacity: value,
+                  child: GameOverOverlay(
+                    key: gameOverKey
+                  ),
+                ),
+            ),
+          ),
+
+        if((board?.maxTileValue ?? 0) == GameBoardBloc.winningTileValue &&
+            (previousBoard?.maxTileValue ?? 0) < GameBoardBloc.winningTileValue)
+
           Positioned.fill(
             child: TweenAnimationBuilder<double>(
               tween: Tween(begin: 0, end: 1),
@@ -132,7 +163,9 @@ class _GameBoardBodyState extends State<GameBoardBody> {
               builder: (context, value, child) =>
                   Opacity(
                     opacity: value,
-                    child: GameOverScreen(),
+                    child: YouWinOverlay(
+                      key: gameOverKey
+                    ),
                   ),
             ),
           ),
@@ -141,6 +174,12 @@ class _GameBoardBodyState extends State<GameBoardBody> {
   }
   void move(MovementDirection direction) async {
     // Provider.of<GameController>(context, listen: false).move(direction, _duration);
+    if(gameOverKey.currentState?.mounted ?? false)
+      return;
+
+    if(youWinKey.currentState?.mounted ?? false)
+      return;
+
     context.read<GameBoardBloc>().add(
       GameBoardMovedEvent(direction, _duration)
     );
@@ -201,6 +240,7 @@ class _GameBoardBodyState extends State<GameBoardBody> {
 
   void onPointerDown(PointerDownEvent event){
     print(event);
+    keyboardListenerFocusNode.requestFocus();
     // panOffset = Offset(0, 0);
   }
 
@@ -278,7 +318,7 @@ class TileWidget extends StatelessWidget {
                     if(value < 1)
                       for(var parent in tile.parents)
                         Positioned.fill(
-                            child: TileWidgetContent(tile: parent,)
+                          child: TileWidgetContent(tile: parent,)
                         ),
 
                     Positioned.fill(
@@ -304,13 +344,13 @@ class TileWidgetContent extends StatelessWidget {
     return LayoutBuilder(
         builder: (context, constraints) {
           final _numberPadding = EdgeInsets.symmetric(
-              vertical: constraints.maxHeight * 0.15,
-              horizontal: constraints.maxWidth * 0.025
+            vertical: constraints.maxHeight * 0.15,
+            horizontal: constraints.maxWidth * 0.025
           );
           return Container(
             decoration: BoxDecoration(
-                color: tile?.color ?? Colors.white,
-                borderRadius: borderRadius
+              color: tile?.color ?? Colors.white,
+              borderRadius: borderRadius
             ),
             child: Padding(
               padding: _numberPadding,
@@ -318,8 +358,8 @@ class TileWidgetContent extends StatelessWidget {
                 child: Text(
                   tile?.value?.toString() ?? '',
                   style: TextStyle(
-                      color: (tile?.dark ?? false) ? Colors.white : Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.bold
+                    color: (tile?.dark ?? false) ? Colors.white : Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold
                   ),
                 ),
               ),
@@ -330,7 +370,10 @@ class TileWidgetContent extends StatelessWidget {
   }
 }
 
-class GameOverScreen extends StatelessWidget {
+class GameOverOverlay extends StatelessWidget {
+
+  const GameOverOverlay({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -343,16 +386,16 @@ class GameOverScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text("Game over!", style: Theme.of(context).textTheme.headline3.copyWith(
-                fontWeight: FontWeight.bold
+              fontWeight: FontWeight.bold
             ),),
             SizedBox(
               height: 15,
             ),
             TextButton(
-                onPressed: () => resetBoard(context),
-                child: Text("Try again", style: Theme.of(context).textTheme.headline6.copyWith(
-                    color: Theme.of(context).scaffoldBackgroundColor
-                ),)
+              onPressed: () => resetBoard(context),
+              child: Text("Try again", style: Theme.of(context).textTheme.headline6.copyWith(
+                color: Theme.of(context).scaffoldBackgroundColor
+              ),)
             )
           ],
         ),
@@ -364,5 +407,64 @@ class GameOverScreen extends StatelessWidget {
     // Provider.of<GameController>(context, listen: false).initGame();
     var bloc = context.read<GameBoardBloc>();
     bloc.add(GameBoardResetEvent());
+  }
+}
+
+class YouWinOverlay extends StatelessWidget {
+
+  const YouWinOverlay({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+          borderRadius: borderRadius
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("You win!", style: Theme.of(context).textTheme.headline3.copyWith(
+              fontWeight: FontWeight.bold
+            ),),
+            SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () => continueBoard(context),
+                  child: Text("Continue", style: Theme.of(context).textTheme.headline6.copyWith(
+                      color: Theme.of(context).scaffoldBackgroundColor
+                  ),)
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                TextButton(
+                    onPressed: () => resetBoard(context),
+                    child: Text("Restart", style: Theme.of(context).textTheme.headline6.copyWith(
+                        color: Theme.of(context).scaffoldBackgroundColor
+                    ),)
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  void resetBoard(BuildContext context){
+    var bloc = context.read<GameBoardBloc>();
+    bloc.add(GameBoardResetEvent());
+  }
+
+  void continueBoard(BuildContext context){
+    var bloc = context.read<GameBoardBloc>();
+    bloc.add(GameBoardContinuedEvent());
   }
 }

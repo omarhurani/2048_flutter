@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:bloc/bloc.dart';
 import 'package:game_2048/game_board/controller/event/game_board_event.dart';
 import 'package:game_2048/game_board/controller/state/game_board_state.dart';
@@ -9,6 +11,7 @@ import 'package:game_2048/game_board/repo/saved_game_board_repo.dart';
 class GameBoardBloc extends Bloc<GameBoardEvent, GameBoardState>{
 
   static const int _initTiles = 2;
+  static const int winningTileValue = 2048;
 
   final SavedGameBoardRepository _savedGameBoardRepository;
   Timer _mergeTimer;
@@ -32,6 +35,10 @@ class GameBoardBloc extends Bloc<GameBoardEvent, GameBoardState>{
         break;
       case GameBoardResetEvent:
         yield await _resetBoard((event as GameBoardResetEvent).x, (event as GameBoardResetEvent).y);
+        break;
+
+      case GameBoardContinuedEvent:
+        yield state.copy();
         break;
     }
   }
