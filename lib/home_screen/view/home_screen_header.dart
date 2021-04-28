@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/game_board/controller/bloc/game_board_bloc.dart';
 import 'package:game_2048/game_board/controller/event/game_board_event.dart';
-import 'package:game_2048/game_board/controller/game_board_controller.dart';
 import 'package:game_2048/game_board/controller/state/game_board_state.dart';
 import 'package:game_2048/home_screen/view/home_screen_overlay_manager.dart';
 import 'package:game_2048/utils/theme.dart';
