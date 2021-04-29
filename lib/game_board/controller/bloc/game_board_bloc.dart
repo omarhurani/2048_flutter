@@ -21,7 +21,9 @@ class GameBoardBloc extends Bloc<GameBoardEvent, GameBoardState>{
 
   GameBoardBloc(this._savedGameBoardRepository, {SoundEffectBloc soundEffectBloc}):
       _soundEffectBloc = soundEffectBloc,
-        super(null);
+        super(null) {
+    add(GameBoardStartedEvent());
+  }
 
   @override
   Stream<GameBoardState> mapEventToState(GameBoardEvent event) async *{

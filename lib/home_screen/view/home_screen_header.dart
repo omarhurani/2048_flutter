@@ -4,8 +4,10 @@ import 'package:game_2048/game_board/controller/bloc/game_board_bloc.dart';
 import 'package:game_2048/game_board/controller/event/game_board_event.dart';
 import 'package:game_2048/game_board/controller/state/game_board_state.dart';
 import 'package:game_2048/home_screen/view/home_screen_overlay_manager.dart';
+import 'package:game_2048/sound_effect/controller/bloc/sound_effect_bloc.dart';
+import 'package:game_2048/sound_effect/controller/event/sound_effect_event.dart';
 import 'package:game_2048/utils/theme.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'home_screen_view.dart';
 
@@ -91,7 +93,17 @@ class HomeScreenHeader extends StatelessWidget {
                 SizedBox(
                   height: 10,
                 ),
-                NewGameWidget(),
+                Row(
+                  children: [
+                    NewGameWidget(),
+
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                SoundEffectMuteButton(),
+
               ],
             )
           ],
@@ -166,9 +178,6 @@ class _NewGameWidgetState extends State<NewGameWidget>
     widthController = TextEditingController();
     heightController = TextEditingController();
     var game = context.read<GameBoardBloc>().state;
-    if (game == null) return;
-    widthController.text = game.x.toString();
-    heightController.text = game.y.toString();
   }
 
   void initAnimationControllers() {
@@ -178,6 +187,8 @@ class _NewGameWidgetState extends State<NewGameWidget>
     // );
   }
 
+
+
   @override
   void dispose() {
     // settingsPopupAnimationController?.dispose();
@@ -186,42 +197,40 @@ class _NewGameWidgetState extends State<NewGameWidget>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextButton(
-                onPressed: startNewGame,
-                child: Icon(
-                  Icons.replay,
-                  color: Theme.of(context).textTheme.bodyText1.color,
-                )
+    return BlocListener<GameBoardBloc, GameBoardState>(
+      listener: onGameStateChanged,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextButton(
+              onPressed: startNewGame,
+              child: Icon(
+                Icons.replay,
+                color: Theme.of(context).textTheme.bodyText1.color,
+              )
 
-                // Text("New Game", style: Theme.of(context).textTheme.headline6.copyWith(
-                //     color: Theme.of(context).scaffoldBackgroundColor
-                // ),)
-                ),
-            SizedBox(
-              width: 5,
-            ),
-            TextButton(
-                key: settingsIconKey,
-                onPressed: toggleSettingsShown,
-                child: Icon(
-                  /*(_settingsPopupEntry?.mounted ?? false) ? Icons.add_circle : */
-                  Icons.add,
-                  color: Theme.of(context).textTheme.bodyText1.color,
-                )
+              // Text("New Game", style: Theme.of(context).textTheme.headline6.copyWith(
+              //     color: Theme.of(context).scaffoldBackgroundColor
+              // ),)
+              ),
+          SizedBox(
+            width: 5,
+          ),
+          TextButton(
+              key: settingsIconKey,
+              onPressed: toggleSettingsShown,
+              child: Icon(
+                /*(_settingsPopupEntry?.mounted ?? false) ? Icons.add_circle : */
+                Icons.add,
+                color: Theme.of(context).textTheme.bodyText1.color,
+              )
 
-                // Text("New Game", style: Theme.of(context).textTheme.headline6.copyWith(
-                //     color: Theme.of(context).scaffoldBackgroundColor
-                // ),)
-                ),
-          ],
-        ),
-      ],
+              // Text("New Game", style: Theme.of(context).textTheme.headline6.copyWith(
+              //     color: Theme.of(context).scaffoldBackgroundColor
+              // ),)
+              ),
+        ],
+      ),
     );
   }
 
@@ -286,6 +295,13 @@ class _NewGameWidgetState extends State<NewGameWidget>
     context.read<GameBoardBloc>().add(GameBoardResetEvent(x, y));
 
     if ((_settingsPopupEntry?.mounted ?? false)) toggleSettingsShown();
+  }
+
+  void onGameStateChanged(_, GameBoardState game){
+    if(game == null)
+      return;
+    widthController.text = game.x.toString();
+    heightController.text = game.y.toString();
   }
 }
 
@@ -390,5 +406,23 @@ class SettingsPopup extends StatelessWidget {
       return "Between ${GameBoardState.minSize} and ${GameBoardState.maxSize}";
     }
     return null;
+  }
+}
+
+class SoundEffectMuteButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var soundEffectBloc = context.watch<SoundEffectBloc>();
+    return TextButton(
+      onPressed: () => toggleMute(soundEffectBloc),
+      child: Icon(
+        (soundEffectBloc.state ?? true) ? Icons.volume_up : Icons.volume_off,
+        color: Theme.of(context).textTheme.bodyText1.color,
+      )
+    );
+  }
+
+  void toggleMute(SoundEffectBloc bloc){
+    bloc.add(SoundEffectEvent.soundEnabledToggled);
   }
 }

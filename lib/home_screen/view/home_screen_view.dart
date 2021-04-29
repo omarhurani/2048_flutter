@@ -5,6 +5,7 @@ import 'package:game_2048/game_board/repo/saved_game_board_repo.dart';
 import 'package:game_2048/game_board/view/game_board_view.dart';
 import 'package:game_2048/home_screen/view/home_screen_overlay_manager.dart';
 import 'package:game_2048/sound_effect/controller/bloc/sound_effect_bloc.dart';
+import 'package:game_2048/sound_effect/repo/sound_settings_repo.dart';
 
 import 'home_screen_header.dart';
 
@@ -28,13 +29,16 @@ class HomeScreen extends StatelessWidget {
                   providers: [
                     RepositoryProvider<SavedGameBoardRepository>(
                       create: (_) => SavedGameBoardRepository()
-                    )
+                    ),
+                    RepositoryProvider<SoundSettingsRepository>(
+                        create: (_) => SoundSettingsRepository()
+                    ),
                   ],
                   child: MultiBlocProvider(
                     providers: [
                       BlocProvider(
                           create: (context) =>
-                              SoundEffectBloc()
+                              SoundEffectBloc(context.read<SoundSettingsRepository>())
                       ),
                       BlocProvider(
                         create: (context) =>

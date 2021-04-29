@@ -41,9 +41,6 @@ class _GameBoardBodyState extends State<GameBoardBody> {
   @override
   void initState() {
     super.initState();
-    context.read<GameBoardBloc>().add(
-      GameBoardStartedEvent()
-    );
     keyboardListenerFocusNode = FocusNode();
     gameOverKey = GlobalKey();
     youWinKey = GlobalKey();
@@ -69,7 +66,7 @@ class _GameBoardBodyState extends State<GameBoardBody> {
           padding: _padding,
           child: LayoutBuilder(
               builder: (context, constraints){
-                final size = min(constraints.maxWidth/board.x, constraints.maxHeight/board.y);
+                final size = min(constraints.maxWidth/board.y, constraints.maxHeight/board.x);
 
                 final padding = EdgeInsets.all(size * 0.05);
                 return Listener(
@@ -77,8 +74,8 @@ class _GameBoardBodyState extends State<GameBoardBody> {
                   onPointerMove: (details) => onPointerMove(details, size/16),
                   onPointerUp: onPointerUp,
                   child: Container(
-                    width: size * board.x,
-                    height: size * board.y,
+                    width: size * board.y,
+                    height: size * board.x,
                     color: Colors.transparent,
                     child: RawKeyboardListener(
                       autofocus: true,
