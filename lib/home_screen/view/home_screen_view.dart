@@ -4,7 +4,7 @@ import 'package:game_2048/game_board/controller/bloc/game_board_bloc.dart';
 import 'package:game_2048/game_board/repo/saved_game_board_repo.dart';
 import 'package:game_2048/game_board/view/game_board_view.dart';
 import 'package:game_2048/home_screen/view/home_screen_overlay_manager.dart';
-import 'package:provider/provider.dart';
+import 'package:game_2048/sound_effect/controller/bloc/sound_effect_bloc.dart';
 
 import 'home_screen_header.dart';
 
@@ -33,12 +33,19 @@ class HomeScreen extends StatelessWidget {
                   child: MultiBlocProvider(
                     providers: [
                       BlocProvider(
+                          create: (context) =>
+                              SoundEffectBloc()
+                      ),
+                      BlocProvider(
                         create: (context) =>
-                          GameBoardBloc(RepositoryProvider.of<SavedGameBoardRepository>(context))
+                          GameBoardBloc(
+                            context.read<SavedGameBoardRepository>(),
+                            soundEffectBloc: context.read<SoundEffectBloc>(),
+                          )
                       )
                     ],
                     child: Padding(
-                      padding: const EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(15),
                       child: LayoutBuilder(
                         builder: (context, constraints){
                           return ConstrainedBox(

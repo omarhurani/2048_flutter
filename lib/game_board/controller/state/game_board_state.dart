@@ -123,4 +123,6 @@ class GameBoardState{
     return maxTileValue;
   }
 
+  bool get merged => board.every((e) => e.every((e) => e.length <= 1));
+
 }

@@ -7,6 +7,8 @@ import 'package:game_2048/game_board/controller/state/game_board_state.dart';
 import 'package:game_2048/game_board/model/movement_direction.dart';
 import 'package:game_2048/game_board/model/tile.dart';
 import 'package:game_2048/game_board/repo/saved_game_board_repo.dart';
+import 'package:game_2048/sound_effect/controller/bloc/sound_effect_bloc.dart';
+import 'package:game_2048/sound_effect/controller/event/sound_effect_event.dart';
 
 class GameBoardBloc extends Bloc<GameBoardEvent, GameBoardState>{
 
@@ -15,8 +17,10 @@ class GameBoardBloc extends Bloc<GameBoardEvent, GameBoardState>{
 
   final SavedGameBoardRepository _savedGameBoardRepository;
   Timer _mergeTimer;
+  final SoundEffectBloc _soundEffectBloc;
 
-  GameBoardBloc(this._savedGameBoardRepository):
+  GameBoardBloc(this._savedGameBoardRepository, {SoundEffectBloc soundEffectBloc}):
+      _soundEffectBloc = soundEffectBloc,
         super(null);
 
   @override
@@ -44,9 +48,10 @@ class GameBoardBloc extends Bloc<GameBoardEvent, GameBoardState>{
   }
 
   Future<GameBoardState> _startGame() async {
-    return await _savedGameBoardRepository.loadGameBoardState() ??
+    var board = await _savedGameBoardRepository.loadGameBoardState() ??
     GameBoardState().copyWithRandomTiles(_initTiles);
 
+    return _mergeBoard(board);
   }
 
   Future<GameBoardState> _resetBoard(int x, int y) async {
@@ -71,12 +76,22 @@ class GameBoardBloc extends Bloc<GameBoardEvent, GameBoardState>{
     var merges = _calculateBoardMerges(newState, iterables, offsets);
     if(changes == 0 && merges == 0)
       return;
+    _soundEffectBloc.add(SoundEffectEvent.tileMoved);
     _calculateBoardMovements(newState, iterables, offsets);
     yield newState;
     var mergedState = _mergeBoard(newState);
     mergedState = mergedState.copyWithRandomTiles();
     _mergeTimer?.cancel();
     await Future.delayed(duration ?? Duration());
+    if(!newState.merged && mergedState.merged){
+      if(newState.maxTileValue < mergedState.maxTileValue){
+        _soundEffectBloc.add(SoundEffectEvent.newTileMerged);
+      }
+      else{
+        _soundEffectBloc.add(SoundEffectEvent.tileMerged);
+      }
+
+    }
     if(newState == state){
       yield mergedState;
     }
@@ -153,9 +168,8 @@ class GameBoardBloc extends Bloc<GameBoardEvent, GameBoardState>{
     for(var row in state.board)
       for(var col in row)
         if(col.length > 1){
-          var mergedValue = col.reduce(
-                  (v, e) =>
-                  Tile(v.value + e.value, parents: Set<Tile>.of([]..add(e)..add(v)))
+          var mergedValue = col.reduce((v, e) =>
+            Tile(v.value + e.value, parents: Set<Tile>.of([]..add(e)..add(v)))
           );
           // print("Merge ${mergedValue.parents}");
           col.clear();
@@ -203,6 +217,20 @@ class GameBoardBloc extends Bloc<GameBoardEvent, GameBoardState>{
   void onChange(Change<GameBoardState> change) {
     super.onChange(change);
     _savedGameBoardRepository.saveGameBoardState(change.nextState);
+  }
+
+  void sendSoundEvent(Change<GameBoardState> change){
+    if(_soundEffectBloc == null || change.currentState == null || change.nextState == null)
+      return;
+    if(change.currentState.maxTileValue < change.nextState.maxTileValue){
+      _soundEffectBloc.add(SoundEffectEvent.newTileMerged);
+    }
+    else if(!change.currentState.merged && change.nextState.merged){
+      _soundEffectBloc.add(SoundEffectEvent.tileMerged);
+    }
+    else{
+      _soundEffectBloc.add(SoundEffectEvent.tileMoved);
+    }
   }
 
 }
