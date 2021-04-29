@@ -239,7 +239,7 @@ class _GameBoardBodyState extends State<GameBoardBody> {
   }
 
   void onPointerDown(PointerDownEvent event){
-    print(event);
+    // print(event);
     keyboardListenerFocusNode.requestFocus();
     // panOffset = Offset(0, 0);
   }

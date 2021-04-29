@@ -13,39 +13,48 @@ class HomeScreenHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: LayoutBuilder(
-          builder: (context, constraints) {
-            var smallScreen = constraints.maxWidth < HomeScreen.maxGameWidth;
-            return Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: smallScreen ? MainAxisAlignment.spaceAround : MainAxisAlignment.spaceBetween,
-              children: [
-                RichText(
-                  text: TextSpan(
-                      text: "2048",
-                      style: Theme.of(context).textTheme.headline1.copyWith(
-                          height: 1
-                      ),
-                      children: [
-                        TextSpan(
-                          text: "\nby Omar Hurani",
-                          style: Theme.of(context).textTheme.headline6,
-                        )
-                      ]
-                  ),
-                ),
-
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: smallScreen ? CrossAxisAlignment.center : CrossAxisAlignment.end,
+      child: LayoutBuilder(builder: (context, constraints) {
+        var smallScreen = constraints.maxWidth < HomeScreen.maxGameWidth;
+        return Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: smallScreen ? MainAxisAlignment.spaceAround : MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              text: TextSpan(
+                  text: "2048",
+                  style:
+                  smallScreen ? Theme.of(context).textTheme.headline2.copyWith(
+                    height: 1,
+                    fontWeight: FontWeight.bold,
+                  ):
+                  Theme.of(context).textTheme.headline1.copyWith(height: 1),
                   children: [
-                    Flex(
-                      direction: smallScreen ? Axis.vertical : Axis.horizontal,
-                      mainAxisAlignment:  MainAxisAlignment.end,
-                      children: [
-                        BlocBuilder<GameBoardBloc, GameBoardState>(
-                          builder: (context, state) => TweenAnimationBuilder<double>(
-                              tween: Tween(begin: 0, end: state?.score?.toDouble() ?? 0),
+                    TextSpan(
+                      text: "\nby Omar Hurani",
+                      style: smallScreen ? Theme.of(context).textTheme.bodyText1.copyWith(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.w600
+                      ) :
+                      Theme.of(context).textTheme.headline6,
+                    )
+                  ]),
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: smallScreen
+                  ? CrossAxisAlignment.center
+                  : CrossAxisAlignment.end,
+              children: [
+                Flex(
+                  direction: smallScreen ? Axis.vertical : Axis.horizontal,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    BlocBuilder<GameBoardBloc, GameBoardState>(
+                      builder: (context, state) =>
+                          TweenAnimationBuilder<double>(
+                              tween: Tween(
+                                  begin: 0, end: state?.score?.toDouble() ?? 0),
                               duration: Duration(milliseconds: 250),
                               curve: Curves.easeOut,
                               builder: (context, value, child) {
@@ -53,74 +62,74 @@ class HomeScreenHeader extends StatelessWidget {
                                   title: "Score",
                                   score: value.toInt(),
                                 );
-                              }
-                          ),
-                        ),
-
-                        SizedBox(
-                          width: 10,
-                          height: 10,
-                        ),
-
-                        BlocBuilder<GameBoardBloc, GameBoardState>(
-                          builder: (context, state) => TweenAnimationBuilder<double>(
-                              tween: Tween(begin: 0, end: state?.bestScore?.toDouble() ?? 0),
+                              }),
+                    ),
+                    SizedBox(
+                      width: 10,
+                      height: 10,
+                    ),
+                    BlocBuilder<GameBoardBloc, GameBoardState>(
+                      builder: (context, state) =>
+                          TweenAnimationBuilder<double>(
+                              tween: Tween(
+                                  begin: 0,
+                                  end: state?.bestScore?.toDouble() ?? 0),
                               duration: Duration(milliseconds: 250),
                               curve: Curves.easeOut,
                               builder: (context, value, child) {
                                 return ScoreIndicator(
-                                  title: "Best " + (state != null ? "(${state.x} × ${state.y})" : ""),
+                                  title: "Best " +
+                                      (state != null
+                                          ? "(${state.x} × ${state.y})"
+                                          : ""),
                                   score: value.toInt(),
                                 );
-                              }
-                          ),
-                        ),
-                      ],
+                              }),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    NewGameWidget(),
                   ],
-                )
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                NewGameWidget(),
               ],
-            );
-          }
-      ),
+            )
+          ],
+        );
+      }),
     );
   }
 }
+
 class ScoreIndicator extends StatelessWidget {
   final String title;
   final int score;
 
-  const ScoreIndicator({
-    Key key,
-    @required this.title,
-    @required this.score
-  }): super(key: key);
+  const ScoreIndicator({Key key, @required this.title, @required this.score})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: Theme.of(context).backgroundColor,
-          borderRadius: borderRadius
-      ),
-      padding: const EdgeInsets.symmetric(
-          vertical: 2.5,
-          horizontal: 15
-      ),
+          color: Theme.of(context).backgroundColor, borderRadius: borderRadius),
+      padding: const EdgeInsets.symmetric(vertical: 2.5, horizontal: 15),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(title ?? '', style: Theme.of(context).textTheme.headline6.copyWith(
-              color: Theme.of(context).scaffoldBackgroundColor
-          ),),
-          Text(score?.toString() ?? '', style: Theme.of(context).textTheme.bodyText1.copyWith(
-              fontSize: 24
-          ),),
-
+          Text(
+            title ?? '',
+            style: Theme.of(context).textTheme.headline6.copyWith(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  fontSize: 18,
+                ),
+          ),
+          Text(
+            score?.toString() ?? '',
+            style: Theme.of(context).textTheme.bodyText1.copyWith(
+                  fontSize: 17,
+                ),
+          ),
         ],
       ),
     );
@@ -132,8 +141,8 @@ class NewGameWidget extends StatefulWidget {
   _NewGameWidgetState createState() => _NewGameWidgetState();
 }
 
-class _NewGameWidgetState extends State<NewGameWidget> with TickerProviderStateMixin{
-
+class _NewGameWidgetState extends State<NewGameWidget>
+    with TickerProviderStateMixin {
   TextEditingController widthController, heightController;
   GlobalKey<FormState> formKey;
   GlobalKey settingsIconKey;
@@ -153,17 +162,16 @@ class _NewGameWidgetState extends State<NewGameWidget> with TickerProviderStateM
     initAnimationControllers();
   }
 
-  void initInputControllers(){
+  void initInputControllers() {
     widthController = TextEditingController();
     heightController = TextEditingController();
     var game = context.read<GameBoardBloc>().state;
-    if(game == null)
-      return;
+    if (game == null) return;
     widthController.text = game.x.toString();
     heightController.text = game.y.toString();
   }
 
-  void initAnimationControllers(){
+  void initAnimationControllers() {
     // settingsPopupAnimationController = AnimationController(
     //   vsync: this,
     //   duration: const Duration(milliseconds: 250),
@@ -191,27 +199,28 @@ class _NewGameWidgetState extends State<NewGameWidget> with TickerProviderStateM
                   color: Theme.of(context).textTheme.bodyText1.color,
                 )
 
-              // Text("New Game", style: Theme.of(context).textTheme.headline6.copyWith(
-              //     color: Theme.of(context).scaffoldBackgroundColor
-              // ),)
+                // Text("New Game", style: Theme.of(context).textTheme.headline6.copyWith(
+                //     color: Theme.of(context).scaffoldBackgroundColor
+                // ),)
+                ),
+            SizedBox(
+              width: 5,
             ),
-            SizedBox(width: 5,),
             TextButton(
-              key: settingsIconKey,
-              onPressed: toggleSettingsShown,
-              child: Icon(
-                /*(_settingsPopupEntry?.mounted ?? false) ? Icons.add_circle : */
-                Icons.add,
-                color: Theme.of(context).textTheme.bodyText1.color,
-              )
+                key: settingsIconKey,
+                onPressed: toggleSettingsShown,
+                child: Icon(
+                  /*(_settingsPopupEntry?.mounted ?? false) ? Icons.add_circle : */
+                  Icons.add,
+                  color: Theme.of(context).textTheme.bodyText1.color,
+                )
 
-              // Text("New Game", style: Theme.of(context).textTheme.headline6.copyWith(
-              //     color: Theme.of(context).scaffoldBackgroundColor
-              // ),)
-            ),
+                // Text("New Game", style: Theme.of(context).textTheme.headline6.copyWith(
+                //     color: Theme.of(context).scaffoldBackgroundColor
+                // ),)
+                ),
           ],
         ),
-
       ],
     );
   }
@@ -219,9 +228,9 @@ class _NewGameWidgetState extends State<NewGameWidget> with TickerProviderStateM
   void toggleSettingsShown() async {
     // var settings = showSettings;
     setState(() {
-    //   showSettings = !showSettings;
+      //   showSettings = !showSettings;
     });
-    if(!(_settingsPopupEntry?.mounted ?? false)){
+    if (!(_settingsPopupEntry?.mounted ?? false)) {
       var animation = AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 250),
@@ -237,8 +246,7 @@ class _NewGameWidgetState extends State<NewGameWidget> with TickerProviderStateM
       ).dispatch(context);
       // Overlay.of(context).insert(_settingsPopupEntry);
       // settingsPopupAnimationController.forward();
-    }
-    else{
+    } else {
       // await settingsPopupAnimationController.reverse();
       OverlayNotification(
         OverlayNotificationType.remove,
@@ -249,13 +257,15 @@ class _NewGameWidgetState extends State<NewGameWidget> with TickerProviderStateM
     }
   }
 
-  OverlayEntry createSettingsPopupEntry(Animation animation){
+  OverlayEntry createSettingsPopupEntry(Animation animation) {
     RenderBox renderBox = settingsIconKey.currentContext.findRenderObject();
 
     var offset = renderBox.localToGlobal(Offset.zero);
-    return OverlayEntry(builder: (context){
+    return OverlayEntry(builder: (context) {
       return Positioned(
-        right: MediaQuery.of(context).size.width - offset.dx - renderBox.size.width,
+        right: MediaQuery.of(context).size.width -
+            offset.dx -
+            renderBox.size.width,
         top: offset.dy + 45,
         child: FadeTransition(
           opacity: animation,
@@ -270,20 +280,16 @@ class _NewGameWidgetState extends State<NewGameWidget> with TickerProviderStateM
     });
   }
 
-  void startNewGame([int x, int y]){
+  void startNewGame([int x, int y]) {
     // Provider.of<GameController>(context, listen: false)
     //     .initGame(x: x, y: y);
-    context.read<GameBoardBloc>().add(
-      GameBoardResetEvent(x, y)
-    );
+    context.read<GameBoardBloc>().add(GameBoardResetEvent(x, y));
 
-    if((_settingsPopupEntry?.mounted ?? false))
-      toggleSettingsShown();
+    if ((_settingsPopupEntry?.mounted ?? false)) toggleSettingsShown();
   }
 }
 
 class SettingsPopup extends StatelessWidget {
-
   static final overlayKey = 'settings-popup';
 
   final TextEditingController widthController, heightController;
@@ -301,7 +307,6 @@ class SettingsPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-
       color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9),
       borderRadius: borderRadius,
       elevation: 10,
@@ -328,9 +333,7 @@ class SettingsPopup extends StatelessWidget {
                       controller: widthController,
                       validator: sizeValidator,
                       keyboardType: TextInputType.numberWithOptions(
-                        signed: false,
-                        decimal: false
-                      ),
+                          signed: false, decimal: false),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       style: Theme.of(context).textTheme.headline6,
                       textAlign: TextAlign.center,
@@ -343,9 +346,7 @@ class SettingsPopup extends StatelessWidget {
                       controller: heightController,
                       validator: sizeValidator,
                       keyboardType: TextInputType.numberWithOptions(
-                          signed: false,
-                          decimal: false
-                      ),
+                          signed: false, decimal: false),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       style: Theme.of(context).textTheme.headline6,
                       textAlign: TextAlign.center,
@@ -353,16 +354,18 @@ class SettingsPopup extends StatelessWidget {
                   ),
                 ],
               ),
-
             ),
-            SizedBox(height: 5,),
+            SizedBox(
+              height: 5,
+            ),
             Center(
               child: TextButton(
-                onPressed: startNewGame,
-                child: Text("Start", style: Theme.of(context).textTheme.headline6.copyWith(
-                  color: Theme.of(context).scaffoldBackgroundColor
-                ),)
-              ),
+                  onPressed: startNewGame,
+                  child: Text(
+                    "Start",
+                    style: Theme.of(context).textTheme.headline6.copyWith(
+                        color: Theme.of(context).scaffoldBackgroundColor),
+                  )),
             ),
           ],
         ),
@@ -370,20 +373,20 @@ class SettingsPopup extends StatelessWidget {
     );
   }
 
-  void startNewGame(){
-    if(!formKey.currentState.validate())
-      return;
+  void startNewGame() {
+    if (!formKey.currentState.validate()) return;
     int width = int.tryParse(widthController.text) ?? 4;
     int height = int.tryParse(heightController.text) ?? 4;
     onStartPressed(width, height);
   }
 
-  String sizeValidator(String value){
+  String sizeValidator(String value) {
     var intValue = int.tryParse(value);
-    if(intValue == null){
+    if (intValue == null) {
       return "";
     }
-    if(intValue.clamp(GameBoardState.minSize, GameBoardState.maxSize) != intValue){
+    if (intValue.clamp(GameBoardState.minSize, GameBoardState.maxSize) !=
+        intValue) {
       return "Between ${GameBoardState.minSize} and ${GameBoardState.maxSize}";
     }
     return null;
