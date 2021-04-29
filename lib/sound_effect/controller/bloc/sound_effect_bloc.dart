@@ -47,7 +47,12 @@ class SoundEffectBloc extends Bloc<SoundEffectEvent, bool> {
     if(_soundSettingsRepository == null)
       return true;
 
+    SoundEffect.values.forEach((element) {
+      _audioPlayer.setUrl(element.url);
+    });
+
     return await _soundSettingsRepository.loadSoundEnabledState();
+
   }
 
   @override
