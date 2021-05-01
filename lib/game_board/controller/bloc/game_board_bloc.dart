@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'package:audioplayers/audio_cache.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:bloc/bloc.dart';
 import 'package:game_2048/game_board/controller/event/game_board_event.dart';
 import 'package:game_2048/game_board/controller/state/game_board_state.dart';
