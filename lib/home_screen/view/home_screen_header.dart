@@ -8,6 +8,7 @@ import 'package:game_2048/sound_effect/controller/bloc/sound_effect_bloc.dart';
 import 'package:game_2048/sound_effect/controller/event/sound_effect_event.dart';
 import 'package:game_2048/utils/theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'home_screen_view.dart';
 
@@ -212,7 +213,7 @@ class _NewGameWidgetState extends State<NewGameWidget>
           TextButton(
             onPressed: startNewGame,
             child: Icon(
-              Icons.replay,
+              PhosphorIcons.arrowsClockwiseBold,
               color: Theme.of(context).textTheme.bodyText1.color,
             )
 
@@ -228,7 +229,7 @@ class _NewGameWidgetState extends State<NewGameWidget>
               onPressed: toggleSettingsShown,
               child: Icon(
                 /*(_settingsPopupEntry?.mounted ?? false) ? Icons.add_circle : */
-                Icons.add,
+                PhosphorIcons.plusBold,
                 color: Theme.of(context).textTheme.bodyText1.color,
               )
 
@@ -362,7 +363,7 @@ class SettingsPopup extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  Center(child: Icon(Icons.clear)),
+                  Center(child: Icon(PhosphorIcons.xBold)),
                   SizedBox(
                     width: 60,
                     child: TextFormField(
@@ -423,7 +424,7 @@ class SoundEffectMuteButton extends StatelessWidget {
     return TextButton(
       onPressed: () => toggleMute(soundEffectBloc),
       child: Icon(
-        (soundEffectBloc.state ?? true) ? Icons.volume_up : Icons.volume_off,
+        (soundEffectBloc.state ?? true) ? PhosphorIcons.speakerHighFill : PhosphorIcons.speakerSlashFill,
         color: Theme.of(context).textTheme.bodyText1.color,
       )
     );
