@@ -1,12 +1,12 @@
 {
-    "name": "game_2048",
-    "short_name": "game_2048",
+    "name": "2048 Game By Omar Hurani",
+    "short_name": "2048",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#FAF8EF",
+    "theme_color": "#EEE4DA",
+    "description": "The popular 2048 game, recreated with Flutter",
+    "orientation": "portrait",
     "prefer_related_applications": false,
     "icons": [
         {

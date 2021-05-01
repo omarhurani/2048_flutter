@@ -1,38 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    Fore more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-  -->
   <base href="/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="The popular 2048 game, recreated with Flutter">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="game_2048">
+  <meta name="apple-mobile-web-app-title" content="2048">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>game_2048</title>
+  <title>2048</title>
   <link rel="manifest" href="manifest.json">
 </head>
-<body>
-  <!-- This script installs service_worker.js to provide PWA functionality to
-       application. For more information, see:
-       https://developers.google.com/web/fundamentals/primers/service-workers -->
+<body id="body">
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('flutter-first-frame', function () {
@@ -40,6 +27,41 @@
       });
     }
   </script>
+
+  <script>
+    function playEmptySound(){
+        var audioContext = new (window.AudioContext || window.webkitAudioContext)()
+        var buffer = audioContext.createBuffer(32, 1, 8000)
+        var source = audioContext.createBufferSource()
+        if(!source)
+            return false
+
+        source.buffer = buffer
+        if(!source.start)
+            source.start = source.noteOn
+
+        if(!source.start)
+            return false
+
+        var gainNode = audioContext.createGain()
+        gainNode.gain.value = 0
+        source.connect(gainNode)
+        gainNode.connect(audioContext.destination)
+
+        source.start(0)
+
+        return true
+    }
+    function touchHandler () {
+        document.querySelector('#body').removeEventListener('pointerup', touchHandler);
+        playEmptySound()
+    }
+
+    // document.querySelector('#body').addEventListener('pointerup', touchHandler);
+  </script>
+
   <script src="main.dart.js" type="application/javascript"></script>
+
+
 </body>
 </html>
