@@ -56,117 +56,131 @@ class _GameBoardBodyState extends State<GameBoardBody> {
       return Center(
         child: CircularProgressIndicator()
       );
-    return Stack(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).backgroundColor,
-            borderRadius: borderRadius
-          ),
-          padding: _padding,
-          child: LayoutBuilder(
-              builder: (context, constraints){
-                final size = min(constraints.maxWidth/board.y, constraints.maxHeight/board.x);
+    return Theme(
+      data: Theme.of(context).copyWith(
+        textButtonTheme: TextButtonThemeData(
+          style: Theme.of(context).textButtonTheme.style.copyWith(
+            padding: MaterialStateProperty.all<EdgeInsets>(
+                const EdgeInsets.symmetric(vertical: 15, horizontal: 25)
+            )
+          )
+        )
+      ),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).backgroundColor,
+                borderRadius: borderRadius
+              ),
+              padding: _padding,
+              child: LayoutBuilder(
+                  builder: (context, constraints){
+                    final size = min(constraints.maxWidth/board.y, constraints.maxHeight/board.x);
 
-                final padding = EdgeInsets.all(size * 0.05);
-                return Listener(
-                  onPointerDown: onPointerDown,
-                  onPointerMove: (details) => onPointerMove(details, size/16),
-                  onPointerUp: onPointerUp,
-                  child: Container(
-                    width: size * board.y,
-                    height: size * board.x,
-                    color: Colors.transparent,
-                    child: RawKeyboardListener(
-                      autofocus: true,
-                      focusNode: keyboardListenerFocusNode,
-                      onKey: onKey,
-                      child: Stack(
-                        children: [
-                          for (var row in board.board.asMap().entries)
-                            for (var col in row.value.asMap().entries)
-                              AnimatedPositioned(
-                                left: size * col.key,
-                                top: size * row.key,
-                                duration: _duration,
-                                curve: _curve,
-                                child: Container(
-                                  width: size,
-                                  height: size,
-                                  padding: padding,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).accentColor,
-                                      borderRadius: borderRadius
-                                    ),                        // margin: _padding,
-                                  ),
-                                ),
-                              ),
-
-                          for (var row in board.board.asMap().entries)
-                            for (var col in row.value.asMap().entries)
-                              for (var tile in col.value)
-                                AnimatedPositioned(
-                                  key: ValueKey(tile),
-                                  left: size * col.key,
-                                  top: size * row.key,
-                                  duration: _duration,
-                                  curve: _curve,
-                                  child: Container(
+                    final padding = EdgeInsets.all(size * 0.05);
+                    return Listener(
+                      onPointerDown: onPointerDown,
+                      onPointerMove: (details) => onPointerMove(details, size/4),
+                      onPointerUp: onPointerUp,
+                      child: Container(
+                        width: size * board.y,
+                        height: size * board.x,
+                        color: Colors.transparent,
+                        child: RawKeyboardListener(
+                          autofocus: true,
+                          focusNode: keyboardListenerFocusNode,
+                          onKey: onKey,
+                          child: Stack(
+                            children: [
+                              for (var row in board.board.asMap().entries)
+                                for (var col in row.value.asMap().entries)
+                                  AnimatedPositioned(
+                                    left: size * col.key,
+                                    top: size * row.key,
+                                    duration: _duration,
+                                    curve: _curve,
+                                    child: Container(
                                       width: size,
                                       height: size,
                                       padding: padding,
                                       child: Container(
-                                        width: size,
-                                        height: size,
-                                        child: TileWidget(
-                                          // key: ValueKey(tile),
-                                            tile: tile
-                                        ),
-                                      )
-
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).accentColor,
+                                          borderRadius: borderRadius
+                                        ),                        // margin: _padding,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                        ],
+
+                              for (var row in board.board.asMap().entries)
+                                for (var col in row.value.asMap().entries)
+                                  for (var tile in col.value)
+                                    AnimatedPositioned(
+                                      key: ValueKey(tile),
+                                      left: size * col.key,
+                                      top: size * row.key,
+                                      duration: _duration,
+                                      curve: _curve,
+                                      child: Container(
+                                          width: size,
+                                          height: size,
+                                          padding: padding,
+                                          child: Container(
+                                            width: size,
+                                            height: size,
+                                            child: TileWidget(
+                                              // key: ValueKey(tile),
+                                                tile: tile
+                                            ),
+                                          )
+
+                                      ),
+                                    ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+              ),
+            ),
+            if(gameBoardBloc.calculateAvailableMoves() == 0)
+              Positioned.fill(
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: _duration,
+                  builder: (context, value, child) =>
+                    Opacity(
+                      opacity: value,
+                      child: GameOverOverlay(
+                        key: gameOverKey
                       ),
                     ),
-                  ),
-                );
-              }
-          ),
-        ),
-        if(gameBoardBloc.calculateAvailableMoves() == 0)
-          Positioned.fill(
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: 1),
-              duration: _duration,
-              builder: (context, value, child) =>
-                Opacity(
-                  opacity: value,
-                  child: GameOverOverlay(
-                    key: gameOverKey
-                  ),
                 ),
-            ),
-          ),
+              ),
 
-        if((board?.maxTileValue ?? 0) == GameBoardBloc.winningTileValue &&
-            (previousBoard?.maxTileValue ?? 0) < GameBoardBloc.winningTileValue)
+            if((board?.maxTileValue ?? 0) == GameBoardBloc.winningTileValue &&
+                (previousBoard?.maxTileValue ?? 0) < GameBoardBloc.winningTileValue)
 
-          Positioned.fill(
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: 1),
-              duration: _duration,
-              builder: (context, value, child) =>
-                  Opacity(
-                    opacity: value,
-                    child: YouWinOverlay(
-                      key: gameOverKey
-                    ),
-                  ),
-            ),
-          ),
-      ],
+              Positioned.fill(
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: _duration,
+                  builder: (context, value, child) =>
+                      Opacity(
+                        opacity: value,
+                        child: YouWinOverlay(
+                          key: gameOverKey
+                        ),
+                      ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
   void move(MovementDirection direction) async {

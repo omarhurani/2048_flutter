@@ -20,91 +20,98 @@ class HomeScreenHeader extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: smallScreen ? MainAxisAlignment.spaceAround : MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            RichText(
-              text: TextSpan(
-                  text: "2048",
-                  style:
-                  smallScreen ? Theme.of(context).textTheme.headline2.copyWith(
-                    height: 1,
-                    fontWeight: FontWeight.bold,
-                  ):
-                  Theme.of(context).textTheme.headline1.copyWith(height: 1),
-                  children: [
-                    TextSpan(
-                      text: "\nby Omar Hurani",
-                      style: smallScreen ? Theme.of(context).textTheme.bodyText1.copyWith(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w600
-                      ) :
-                      Theme.of(context).textTheme.headline6,
-                    )
-                  ]),
+            Expanded(
+              flex: smallScreen ? 1 : 5,
+              child: Align(
+                alignment: smallScreen ? Alignment.center : Alignment.centerLeft,
+                child: RichText(
+                  textAlign: TextAlign.start,
+                  text: TextSpan(
+                      text: "2048",
+                      style: smallScreen ? Theme.of(context).textTheme.headline2.copyWith(
+                        height: 1,
+                        fontWeight: FontWeight.bold,
+                      ):
+                      Theme.of(context).textTheme.headline1.copyWith(height: 1),
+
+                      children: [
+                        TextSpan(
+                          text: "\nby Omar Hurani",
+                          style: smallScreen ? Theme.of(context).textTheme.bodyText1.copyWith(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w600
+                          ) :
+                          Theme.of(context).textTheme.headline6,
+                        )
+                      ]
+                  ),
+                ),
+              ),
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: smallScreen
-                  ? CrossAxisAlignment.center
-                  : CrossAxisAlignment.end,
-              children: [
-                Flex(
-                  direction: smallScreen ? Axis.vertical : Axis.horizontal,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    BlocBuilder<GameBoardBloc, GameBoardState>(
-                      builder: (context, state) =>
-                          TweenAnimationBuilder<double>(
-                              tween: Tween(
-                                  begin: 0, end: state?.score?.toDouble() ?? 0),
-                              duration: Duration(milliseconds: 250),
-                              curve: Curves.easeOut,
-                              builder: (context, value, child) {
-                                return ScoreIndicator(
-                                  title: "Score",
-                                  score: value.toInt(),
-                                );
-                              }),
-                    ),
-                    SizedBox(
-                      width: 10,
-                      height: 10,
-                    ),
-                    BlocBuilder<GameBoardBloc, GameBoardState>(
-                      builder: (context, state) =>
-                          TweenAnimationBuilder<double>(
-                              tween: Tween(
-                                  begin: 0,
-                                  end: state?.bestScore?.toDouble() ?? 0),
-                              duration: Duration(milliseconds: 250),
-                              curve: Curves.easeOut,
-                              builder: (context, value, child) {
-                                return ScoreIndicator(
-                                  title: "Best " +
-                                      (state != null
-                                          ? "(${state.x} × ${state.y})"
-                                          : ""),
-                                  score: value.toInt(),
-                                );
-                              }),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: [
-                    NewGameWidget(),
+            Expanded(
+              flex: smallScreen ? 1 : 3,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: smallScreen
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.end,
+                children: [
+                  Flex(
+                    // direction: smallScreen ? Axis.vertical : Axis.horizontal,
+                    direction: smallScreen ? Axis.vertical : Axis.horizontal,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      BlocBuilder<GameBoardBloc, GameBoardState>(
+                        builder: (context, state) =>
+                            TweenAnimationBuilder<double>(
+                                tween: Tween(
+                                    begin: 0, end: state?.score?.toDouble() ?? 0),
+                                duration: Duration(milliseconds: 250),
+                                curve: Curves.easeOut,
+                                builder: (context, value, child) {
+                                  return ScoreIndicator(
+                                    title: "Score",
+                                    score: value.toInt(),
+                                  );
+                                }),
+                      ),
+                      SizedBox(
+                        width: 10,
+                        height: 10,
+                      ),
+                      BlocBuilder<GameBoardBloc, GameBoardState>(
+                        builder: (context, state) =>
+                            TweenAnimationBuilder<double>(
+                                tween: Tween(
+                                    begin: 0,
+                                    end: state?.bestScore?.toDouble() ?? 0),
+                                duration: Duration(milliseconds: 250),
+                                curve: Curves.easeOut,
+                                builder: (context, value, child) {
+                                  return ScoreIndicator(
+                                    title: "Best " +
+                                        (state != null
+                                            ? "(${state.x} × ${state.y})"
+                                            : ""),
+                                    score: value.toInt(),
+                                  );
+                                }),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  NewGameWidget(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  SoundEffectMuteButton(),
 
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                SoundEffectMuteButton(),
-
-              ],
+                ],
+              ),
             )
           ],
         );
@@ -203,16 +210,16 @@ class _NewGameWidgetState extends State<NewGameWidget>
         mainAxisSize: MainAxisSize.min,
         children: [
           TextButton(
-              onPressed: startNewGame,
-              child: Icon(
-                Icons.replay,
-                color: Theme.of(context).textTheme.bodyText1.color,
-              )
+            onPressed: startNewGame,
+            child: Icon(
+              Icons.replay,
+              color: Theme.of(context).textTheme.bodyText1.color,
+            )
 
-              // Text("New Game", style: Theme.of(context).textTheme.headline6.copyWith(
-              //     color: Theme.of(context).scaffoldBackgroundColor
-              // ),)
-              ),
+            // Text("New Game", style: Theme.of(context).textTheme.headline6.copyWith(
+            //     color: Theme.of(context).scaffoldBackgroundColor
+            // ),)
+            ),
           SizedBox(
             width: 5,
           ),

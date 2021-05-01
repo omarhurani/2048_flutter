@@ -40,7 +40,7 @@ final theme = ThemeData(
       }),
       foregroundColor: MaterialStateProperty.all<Color>(scaffoldBackgroundColor),
       padding: MaterialStateProperty.all<EdgeInsets>(
-          const EdgeInsets.symmetric(vertical: 15, horizontal: 25)
+        const EdgeInsets.symmetric(vertical: 0, horizontal: 0)
       )
     )
   ),

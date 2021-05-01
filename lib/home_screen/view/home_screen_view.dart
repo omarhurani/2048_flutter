@@ -57,15 +57,16 @@ class HomeScreen extends StatelessWidget {
                               maxWidth: constraints.maxWidth.clamp(0, maxGameWidth),
                             ),
                             child: Column(
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             // verticalDirection: VerticalDirection.up,
                             children: [
                               HomeScreenHeader(),
                               SizedBox(
-                                height: 50,
+                                height: constraints.maxHeight/50,
                               ),
-                              Flexible(
+                              Expanded(
                                 child: GameBoard()
                               ),
                             ],
