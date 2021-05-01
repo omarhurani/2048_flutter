@@ -1,8 +1,8 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/sound_effect/controller/event/sound_effect_event.dart';
 import 'package:game_2048/sound_effect/model/SoundEffect.dart';
 import 'package:game_2048/sound_effect/repo/sound_settings_repo.dart';
+import 'package:just_audio/just_audio.dart';
 
 class SoundEffectBloc extends Bloc<SoundEffectEvent, bool> {
   SoundEffectBloc([this._soundSettingsRepository]) : super(null) {
@@ -35,11 +35,9 @@ class SoundEffectBloc extends Bloc<SoundEffectEvent, bool> {
       default:
     }
     if(soundEffect != null && (state ?? true)){
-      _audioPlayer.play(
-        soundEffect.url,
-        isLocal: soundEffect.isLocal,
-        volume: 0.1,
-      ).catchError((_){});
+      _audioPlayer.setUrl(soundEffect.url);
+      _audioPlayer.setVolume(0.1);
+      _audioPlayer.play().catchError((_){});
     }
   }
 
