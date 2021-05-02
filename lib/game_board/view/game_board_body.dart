@@ -61,13 +61,13 @@ class _GameBoardBodyState extends State<GameBoardBody> {
         textButtonTheme: TextButtonThemeData(
           style: Theme.of(context).textButtonTheme.style.copyWith(
             padding: MaterialStateProperty.all<EdgeInsets>(
-                const EdgeInsets.symmetric(vertical: 15, horizontal: 25)
+              const EdgeInsets.symmetric(vertical: 15, horizontal: 25)
             )
           )
         )
       ),
       child: Align(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.center,
         child: Stack(
           children: [
             Container(

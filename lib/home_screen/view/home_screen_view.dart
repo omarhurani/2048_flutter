@@ -50,7 +50,7 @@ class HomeScreen extends StatelessWidget {
                       )
                     ],
                     child: Padding(
-                      padding: const EdgeInsets.all(15),
+                      padding: const EdgeInsets.all(10),
                       child: LayoutBuilder(
                         builder: (context, constraints){
                           return ConstrainedBox(
@@ -64,12 +64,11 @@ class HomeScreen extends StatelessWidget {
                             // verticalDirection: VerticalDirection.up,
                             children: [
                               HomeScreenHeader(),
-                              SizedBox(
-                                height: constraints.maxHeight/50,
-                              ),
+                              SizedBox(height: constraints.maxHeight/75,),
                               Expanded(
                                 child: GameBoard()
                               ),
+                              SizedBox(height: constraints.maxHeight/75,),
                               HomeScreenFooter(),
                             ],
                           ),);

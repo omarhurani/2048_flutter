@@ -14,110 +14,127 @@ import 'home_screen_view.dart';
 
 class HomeScreenHeader extends StatelessWidget {
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: LayoutBuilder(builder: (context, constraints) {
-        var smallScreen = constraints.maxWidth < HomeScreen.maxGameWidth;
-        return Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: smallScreen ? MainAxisAlignment.spaceAround : MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
+    return LayoutBuilder(builder: (context, constraints) {
+      var smallScreen = constraints.maxWidth < HomeScreen.maxGameWidth;
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: (smallScreen ? 0 : 10)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              flex: smallScreen ? 1 : 5,
-              child: Align(
-                alignment: smallScreen ? Alignment.center : Alignment.centerLeft,
-                child: RichText(
-                  textAlign: TextAlign.start,
-                  text: TextSpan(
-                      text: "2048",
-                      style: smallScreen ? Theme.of(context).textTheme.headline2.copyWith(
-                        height: 1,
-                        fontWeight: FontWeight.bold,
-                      ):
-                      Theme.of(context).textTheme.headline1.copyWith(height: 1),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: smallScreen ? MainAxisAlignment.spaceAround : MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: smallScreen ? 1 : 5,
+                  child: Align(
+                    alignment: smallScreen ? Alignment.center : Alignment.centerLeft,
+                    child: RichText(
+                      textAlign: TextAlign.start,
+                      text: TextSpan(
+                          text: "2048",
+                          style: smallScreen ? Theme.of(context).textTheme.headline2.copyWith(
+                            height: 1,
+                            fontWeight: FontWeight.bold,
+                          ):
+                          Theme.of(context).textTheme.headline1.copyWith(height: 1),
 
-                      children: [
-                        TextSpan(
-                          text: "\nby Omar Hurani",
-                          style: smallScreen ? Theme.of(context).textTheme.bodyText1.copyWith(
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.w600
-                          ) :
-                          Theme.of(context).textTheme.headline6,
-                        )
-                      ]
+                          children: [
+                            TextSpan(
+                              text: "\nby Omar Hurani",
+                              style: smallScreen ? Theme.of(context).textTheme.bodyText1.copyWith(
+                                color: Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.w600
+                              ) :
+                              Theme.of(context).textTheme.headline6,
+                            )
+                          ]
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            Expanded(
-              flex: smallScreen ? 1 : 3,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: smallScreen
-                    ? CrossAxisAlignment.center
-                    : CrossAxisAlignment.end,
-                children: [
-                  Flex(
-                    // direction: smallScreen ? Axis.vertical : Axis.horizontal,
-                    direction: smallScreen ? Axis.vertical : Axis.horizontal,
-                    mainAxisAlignment: MainAxisAlignment.end,
+                Expanded(
+                  flex: smallScreen ? 1 : 3,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: smallScreen
+                        ? CrossAxisAlignment.center
+                        : CrossAxisAlignment.end,
                     children: [
-                      BlocBuilder<GameBoardBloc, GameBoardState>(
-                        builder: (context, state) =>
-                            TweenAnimationBuilder<double>(
-                                tween: Tween(
-                                    begin: 0, end: state?.score?.toDouble() ?? 0),
-                                duration: Duration(milliseconds: 250),
-                                curve: Curves.easeOut,
-                                builder: (context, value, child) {
-                                  return ScoreIndicator(
-                                    title: "Score",
-                                    score: value.toInt(),
-                                  );
-                                }),
+                      Flex(
+                        // direction: smallScreen ? Axis.vertical : Axis.horizontal,
+                        direction: smallScreen ? Axis.vertical : Axis.horizontal,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          BlocBuilder<GameBoardBloc, GameBoardState>(
+                            builder: (context, state) =>
+                                TweenAnimationBuilder<double>(
+                                    tween: Tween(
+                                        begin: 0, end: state?.score?.toDouble() ?? 0),
+                                    duration: Duration(milliseconds: 250),
+                                    curve: Curves.easeOut,
+                                    builder: (context, value, child) {
+                                      return ScoreIndicator(
+                                        title: "Score",
+                                        score: value.toInt(),
+                                      );
+                                    }),
+                          ),
+                          SizedBox(
+                            width: 10,
+                            height: 5,
+                          ),
+                          BlocBuilder<GameBoardBloc, GameBoardState>(
+                            builder: (context, state) =>
+                                TweenAnimationBuilder<double>(
+                                    tween: Tween(
+                                        begin: 0,
+                                        end: state?.bestScore?.toDouble() ?? 0),
+                                    duration: Duration(milliseconds: 250),
+                                    curve: Curves.easeOut,
+                                    builder: (context, value, child) {
+                                      return ScoreIndicator(
+                                        title: "Best " +
+                                            (state != null
+                                                ? "(${state.x} × ${state.y})"
+                                                : ""),
+                                        score: value.toInt(),
+                                      );
+                                    }),
+                          ),
+                        ],
                       ),
                       SizedBox(
-                        width: 10,
-                        height: 10,
+                        height: 5,
                       ),
-                      BlocBuilder<GameBoardBloc, GameBoardState>(
-                        builder: (context, state) =>
-                            TweenAnimationBuilder<double>(
-                                tween: Tween(
-                                    begin: 0,
-                                    end: state?.bestScore?.toDouble() ?? 0),
-                                duration: Duration(milliseconds: 250),
-                                curve: Curves.easeOut,
-                                builder: (context, value, child) {
-                                  return ScoreIndicator(
-                                    title: "Best " +
-                                        (state != null
-                                            ? "(${state.x} × ${state.y})"
-                                            : ""),
-                                    score: value.toInt(),
-                                  );
-                                }),
-                      ),
+                      if(!smallScreen)
+                        NewGameWidget(),
+                      if(!smallScreen)
+                        SizedBox(
+                          height: 10,
+                        ),
+                      if(!smallScreen)
+                        SoundEffectMuteButton(),
+
                     ],
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  NewGameWidget(),
-                  SizedBox(
-                    height: 10,
-                  ),
+                )
+              ],
+            ),
+            if(smallScreen)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   SoundEffectMuteButton(),
-
+                  SizedBox(width: 5,),
+                  NewGameWidget(),
                 ],
-              ),
-            )
+              )
           ],
-        );
-      }),
-    );
+        ),
+      );
+    });
   }
 }
 

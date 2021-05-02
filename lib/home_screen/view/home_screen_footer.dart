@@ -9,14 +9,17 @@ class HomeScreenFooter extends StatelessWidget {
     githubUrl = "https://github.com/omarhurani/2048_flutter",
     websiteUrl = "https://portfolio.omarhurani.me";
 
+  static const double _smallFontSize = 11.5, _largeFontSize = 13;
+
   @override
   Widget build(BuildContext context) {
+    var smallScreen = MediaQuery.of(context).size.height < 800;
     return DefaultTextStyle(
       style: TextStyle(
         color: Theme.of(context).primaryColor,
-        fontSize: 13,
+        fontSize: smallScreen ? _smallFontSize : _largeFontSize,
         fontFamily: Theme.of(context).textTheme.bodyText1.fontFamily,
-        height: 1.5,
+        height: smallScreen ? 1 : 1.5,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -27,7 +30,7 @@ class HomeScreenFooter extends StatelessWidget {
                   text: "Move the tiles using ",
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
-                    fontSize: 13,
+                    fontSize: smallScreen ? _smallFontSize : _largeFontSize,
                     fontFamily: Theme.of(context).textTheme.bodyText1.fontFamily,
                   ),
                   children: [
@@ -60,7 +63,7 @@ class HomeScreenFooter extends StatelessWidget {
                 text: "This game was created for demonstration purposes. Please ",
                 style: TextStyle(
                   color: Theme.of(context).primaryColor,
-                  fontSize: 13,
+                  fontSize: smallScreen ? _smallFontSize : _largeFontSize,
                   fontFamily: Theme.of(context).textTheme.bodyText1.fontFamily,
                 ),
                 children: [
@@ -86,7 +89,8 @@ class HomeScreenFooter extends StatelessWidget {
                 flex: 1,
                 child: IconTheme(
                   data: IconThemeData(
-                    color: Theme.of(context).primaryColor
+                    color: Theme.of(context).primaryColor,
+                    size: smallScreen ? 18 : 24
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
